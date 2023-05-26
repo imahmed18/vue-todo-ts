@@ -1,5 +1,12 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import './registerServiceWorker'
+import Vue from "vue";
+import { createApp } from "vue";
+import { makeServer } from "./server";
+import App from "./App.vue";
+import "./registerServiceWorker";
+import "bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./assets/css/style.css";
 
-createApp(App).mount('#app')
+makeServer();
+
+createApp(App).mount("#app");
