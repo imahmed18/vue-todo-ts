@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { createApp } from "vue";
+import { createPinia } from "pinia";
 import { makeServer } from "./server";
 import App from "./App.vue";
 import "./registerServiceWorker";
@@ -9,4 +10,5 @@ import "./assets/css/style.css";
 
 makeServer();
 
-createApp(App).mount("#app");
+const pinia = createPinia();
+createApp(App).use(pinia).mount("#app");

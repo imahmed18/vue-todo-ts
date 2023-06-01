@@ -23,20 +23,22 @@
               <div class="list-wrapper">
                 <ul
                   class="d-flex flex-column-reverse todo-list"
-                  v-if="items.length && !loading"
+                  v-if="todoStore.todoItems.length && !todoStore.loading"
                 >
                   <TodoListItem
-                    v-for="todo in items"
+                    v-for="todo in todoStore.todoItems"
                     :key="todo.id"
                     @toggleCompleted="toggleCompleted"
                     @deleteItem="deleteItem"
                     :task="todo"
                   />
                 </ul>
-                <div v-if="items.length === 0 && !loading">
+                <div
+                  v-if="todoStore.todoItems.length === 0 && !todoStore.loading"
+                >
                   You have no tasks to do for today. Add first!
                 </div>
-                <div v-if="loading">Loading...</div>
+                <div v-if="todoStore.loading">Loading...</div>
               </div>
             </div>
           </div>
@@ -53,7 +55,9 @@ import TodoButton from "./../components/TodoButton.vue";
 import TodoListItem from "./../components/TodoListItem.vue";
 import { TaskModel } from "./../models/TaskModel";
 import { defineComponent } from "vue";
+import { mapStores } from "pinia";
 import { taskService } from "./../services/api/TaskService";
+import { useTodoStore } from "@/stores/todo";
 
 export default defineComponent({
   name: "TodoList",
@@ -65,30 +69,26 @@ export default defineComponent({
   data() {
     return {
       task: new TaskModel(),
-      items: [] as TaskModel[],
-      loading: true,
+      todoStore: useTodoStore(),
       taskService: taskService,
     };
   },
   async mounted() {
-    this.items = await this.taskService.getAll().then((response) => {
-      this.loading = false;
-      return response;
-    });
+    this.todoStore.populateState();
   },
+  // computed: {
+  //   ...mapStores(useTodoStore),
+  // },
   methods: {
-    async toggleCompleted(task: any) {
-      task.isCompleted = !task.isCompleted;
-      await this.taskService.update(task);
+    toggleCompleted(task: any) {
+      this.todoStore.toggleCompleted(task);
     },
-    async deleteItem(task: any) {
-      await this.taskService.destroy(task);
-      const index = this.items.indexOf(task);
-      this.items.splice(index, 1);
+    deleteItem(task: any) {
+      this.todoStore.deleteItem(task);
     },
     async createTask() {
-      const task = await taskService.save(this.task);
-      this.items.push(task);
+      console.log(this.todoStore.$state.testName);
+      this.todoStore.createTask(this.task);
       this.task = new TaskModel();
     },
   },
